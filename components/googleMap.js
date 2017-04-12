@@ -6,15 +6,16 @@ import Dialog           from 'material-ui/Dialog';
 import Snackbar         from 'material-ui/Snackbar';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 
-import { Map, 
-         TileLayer, 
-         LayersControl, 
-         ZoomControl }    from 'react-leaflet';
+import { Map,
+         TileLayer,
+         ZoomControl,
+         LayersControl }  from 'react-leaflet';
 import Control            from 'react-leaflet-control';
 import GoogleLayer        from './googleMaps/googleLayer';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 
-import FacilityInfo from './facilityInfo';
+import FacilityInfo      from './facilityInfo';
+import ParseFacilityInfo from './parseFacilityInfo';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -125,7 +126,8 @@ export default class GoogleMap extends React.Component {
     let url = `/api/facility/${ NPRI_ID }`;
     $.get( url )
     .then( ( facility ) => {
-      this.setState( { facility: facility, infoPaneOpen: true, isRefreshing: Math.max( this.state.isRefreshing - 1, 0 ) } );
+      let parsedFacilityInfo = ParseFacilityInfo( facility );
+      this.setState( { facility: parsedFacilityInfo, infoPaneOpen: true, isRefreshing: Math.max( this.state.isRefreshing - 1, 0 ) } );
     } )
     .then( this.moveToCoord( latlng.lat, latlng.lng ) )
     .catch( ( err ) => {
