@@ -17,6 +17,14 @@ app.use( bodyParser.json() );
 
 app.use( webpackMiddleware( webpack( require( process.env.WEBPACK_CONFIG ) ) ) );
 
+app.enable( 'trust proxy' );
+
+app.use( function ( req, res, next ) {
+  ( ( process.env.NODE_ENV === 'production' ) && ( req.secure === false ) )
+  ? ( res.redirect( `https://${req.headers.host}${req.url}` ), next() )
+  : next() ;
+});
+
 app.use( express.static( 'public' ) );
 
 app.use( '/api/markers', require( './api/markers/index' ) );
