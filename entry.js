@@ -6,4 +6,4 @@ import App from './components/app';
 
 injectTapEventPlugin();
 
-ReactDOM.render(<App />, document.getElementById("placeholder"));
+ReactDOM.render( <App />, document.getElementById( "placeholder" ) );

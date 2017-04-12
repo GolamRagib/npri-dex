@@ -21,7 +21,7 @@ app.enable( 'trust proxy' );
 
 app.use( function ( req, res, next ) {
   ( ( process.env.NODE_ENV === 'production' ) && ( req.secure === false ) )
-  ? ( res.redirect( `https://${req.headers.host}${req.url}` ), next() )
+  ? ( res.redirect( `https://${ req.headers.host }${ req.url }` ), next() )
   : next() ;
 });
 
@@ -32,4 +32,4 @@ app.use( '/api/facility', require( './api/facility/index' ) );
 
 app.get( '*', ( req, res ) => res.sendFile( __dirname + '/public/index.html' ) )
 
-app.listen( process.env.PORT || 8080 );
+app.listen( process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080, process.env.OPENSHIFT_NODEJS_IP || process.env.IP || '0.0.0.0' );

@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#ac1f34",
   "description": "Explore NPRI data",
-  "icons": [{
+  "icons": [ {
     "src": "/images/launcher-icon-0-75x.png",
     "sizes": "36x36",
     "type": "image/png",
@@ -45,5 +45,5 @@
     "sizes": "384x384",
     "type": "image/png",
     "density": 8.0
-  }]
+  } ]
 }

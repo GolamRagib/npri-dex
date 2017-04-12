@@ -1,5 +1,5 @@
-const webpack = require('webpack');
-const dotenv = require('dotenv-webpack');
+const webpack = require( 'webpack' );
+const dotenv = require( 'dotenv-webpack' );
 
 module.exports =
 { devtool: 'cheap-module-source-map',
