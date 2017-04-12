@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GolamRagib/npri-dex.git"
+  },
   "scripts": {
     "start": "node index.js",
     "startDev": "nodemon index.js",
