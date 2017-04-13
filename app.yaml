@@ -1,0 +1,14 @@
+# [START app_yaml]
+
+# [START runtime]
+runtime: nodejs
+env: flex
+# [END runtime]
+
+skip_files:
+ - ^node_modules$
+ - .env
+ - .production.env
+ - yarn.lock
+ 
+# [END app_yaml]

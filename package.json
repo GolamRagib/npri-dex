@@ -7,6 +7,7 @@
     "type": "git",
     "url": "https://github.com/GolamRagib/npri-dex.git"
   },
+  "private": true,
   "scripts": {
     "start": "node index.js",
     "startDev": "nodemon index.js",
@@ -47,5 +48,8 @@
     "url-loader": "^0.5.8",
     "webpack": "^1.13.3",
     "webpack-dev-middleware": "^1.8.4"
+  },
+  "engines": {
+    "node": ">=6.10.2"
   }
 }
