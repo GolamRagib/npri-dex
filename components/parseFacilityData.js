@@ -3,17 +3,17 @@ import Postal_Code_6_to_7 from './Postal_Code_6_to_7';
 export default function ParseFacilityData( facility ) {
   let tableData = [];
 
-  facility.NPRI_ID 
-  ? tableData.push( { name: "NPRI ID", text: facility.NPRI_ID } )
-  : null ;
+  if( facility.NPRI_ID ) {
+    tableData.push( { name: "NPRI ID", text: facility.NPRI_ID } )
+  };
 
-  facility.COMP_NAME 
-  ? tableData.push( { name: "Company", text: facility.COMP_NAME } )
-  : null ;
+  if( facility.COMP_NAME ) {
+    tableData.push( { name: "Company", text: facility.COMP_NAME } )
+  };
 
-  facility.FACI_NAME 
-  ? tableData.push( { name: "Facility", text: facility.FACI_NAME } )
-  : null ;
+  if( facility.FACI_NAME ) {
+    tableData.push( { name: "Facility", text: facility.FACI_NAME } )
+  };
 
   let ADDR_1 = ( facility.ADDR_1 && facility.ADDR_2 )
   ? `${ facility.ADDR_1 }
@@ -55,33 +55,33 @@ ${ ADDR_2 }`
     tableData.push( { name: "Address", text: ADDR } )
   };
 
-  ( facility.loc.coordinates[0] && facility.loc.coordinates[1] ) 
-  ? tableData.push( { name: "Coordinates", text: `[ ${ facility.loc.coordinates[1] }, ${ facility.loc.coordinates[0] } ]` } )
-  : null ;
+  if ( facility.loc.coordinates[0] && facility.loc.coordinates[1] ) {
+    tableData.push( { name: "Coordinates", text: `[ ${ facility.loc.coordinates[1] }, ${ facility.loc.coordinates[0] } ]` } )
+  };
 
-  ( facility.CSD && facility.CSD.NAME ) 
-  ? tableData.push( { name: "Census Sub-Division", text: facility.CSD.NAME } )
-  : null ;
+  if( facility.CSD && facility.CSD.NAME ) {
+    tableData.push( { name: "Census Sub-Division", text: facility.CSD.NAME } )
+  };
 
-  (facility.CMA && facility.CMA.NAME ) 
-  ? tableData.push( { name: "Census Metropolitan Area", text: facility.CMA.NAME } )
-  : null ;
+  if(facility.CMA && facility.CMA.NAME ) {
+    tableData.push( { name: "Census Metropolitan Area", text: facility.CMA.NAME } )
+  };
 
-  ( facility.ER && facility.ER.NAME ) 
-  ? tableData.push( { name: "Economic Region", text: facility.ER.NAME } )
-  : null ;
+  if( facility.ER && facility.ER.NAME ) {
+    tableData.push( { name: "Economic Region", text: facility.ER.NAME } )
+  };
 
-  ( facility.KIS && facility.KIS.NAME_EN ) 
-  ? tableData.push( { name: "Industry", text: facility.KIS.NAME_EN } )
-  : null ;
+  if( facility.KIS && facility.KIS.NAME_EN ) {
+    tableData.push( { name: "Industry", text: facility.KIS.NAME_EN } )
+  };
 
-  ( facility.ECOZONE && facility.ECOZONE.NAME_EN ) 
-  ? tableData.push( { name: "Ecozone", text: facility.ECOZONE.NAME_EN } )
-  : null ;
+  if( facility.ECOZONE && facility.ECOZONE.NAME_EN ) {
+    tableData.push( { name: "Ecozone", text: facility.ECOZONE.NAME_EN } )
+  };
 
-  ( facility.MDA && facility.MDA.NAME_EN ) 
-  ? tableData.push( { name: "Major Drainage Area", text: facility.MDA.NAME_EN } )
-  : null ;
+  if( facility.MDA && facility.MDA.NAME_EN ) {
+    tableData.push( { name: "Major Drainage Area", text: facility.MDA.NAME_EN } )
+  };
 
   return tableData;
 }

@@ -85,9 +85,9 @@ export default class GoogleMap extends React.Component {
                    lng1: ( lngNE + lngDelta ),
                    lng2: ( lngSW - lngDelta ) };
 
-    ( !( JSON.stringify( bounds ) === JSON.stringify( this.state.bounds ) ) )
-    ? this.setState( { bounds: bounds, isRefreshing: ( this.state.isRefreshing + 1 ) }, this.fetchMarkers( bounds ) )
-    : null;
+    if ( !( JSON.stringify( bounds ) === JSON.stringify( this.state.bounds ) ) ) {
+      this.setState( { bounds: bounds, isRefreshing: ( this.state.isRefreshing + 1 ) }, this.fetchMarkers( bounds ) )
+    };
   };
 
   fetchMarkers = ( bounds ) => {
