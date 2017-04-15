@@ -14,8 +14,8 @@ import Control            from 'react-leaflet-control';
 import GoogleLayer        from './googleMaps/googleLayer';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 
-import FacilityInfo      from './facilityInfo';
-import ParseFacilityInfo from './parseFacilityInfo';
+import FacilityData      from './facilityData';
+import ParseFacilityData from './parseFacilityData';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -38,16 +38,6 @@ const markers = [
   { lat: 83.500, lng: -145.50, options: { id: 'NW limit' } },
 ]; // for testing only
 
-const style = {
-  container: {
-    position: 'relative',
-  },
-  refresh: {
-    display: 'inline-block',
-    position: 'relative',
-  },
-};
-
 export default class GoogleMap extends React.Component {
 
   constructor() {
@@ -56,96 +46,86 @@ export default class GoogleMap extends React.Component {
       markers: [],
       facility: {},
       isRefreshing: 0,
-      infoPaneOpen: false,
+      facilityDataBoxOpen: false,
       mapLocation: [ 43.6482644, -79.3978587 ],
       bounds: { lat1: '', lat2: '', lng1: '', lng2: '' }
     };
-    this.getCurrentPosition = this.getCurrentPosition.bind(this);
-    this.moveToCoord = this.moveToCoord.bind(this);
-    this.updateLimits = this.updateLimits.bind(this);
-    this.fetchMarkers = this.fetchMarkers.bind(this);
-    this.fetchFacilityData = this.fetchFacilityData.bind( this );
-  }
+  };
 
-  closeInfoPane = () => this.setState( { infoPaneOpen: false, facility: {} } );
+  closefacilityDataBox = () => this.setState( { facilityDataBoxOpen: false, facility: {} } );
 
   componentDidMount() {
     setTimeout( this.updateLimits, 250 );
     this.getCurrentPosition();
-  }
+  };
 
-  getCurrentPosition() {
+  getCurrentPosition = () => {
     navigator.geolocation.getCurrentPosition( ( position ) => {
       this.moveToCoord( position.coords.latitude, position.coords.longitude );
     } );
     setTimeout( this.updateLimits, 250 );
-  }
+  };
 
-  moveToCoord( lat, lng ) {
-    this.refs.map.leafletElement.panTo( { lat: lat, lng: lng } );
+  moveToCoord = ( lat, lng ) => {
+    this.leafletMap.leafletElement.panTo( { lat: lat, lng: lng } );
     this.updateLimits();
-  }
+  };
 
-  updateLimits() {
-    let mapLimits = this.refs.map.leafletElement.getBounds();
-    let latNE = mapLimits._northEast.lat;
-    let latSW = mapLimits._southWest.lat;
-    let lngNE = mapLimits._northEast.lng;
-    let lngSW = mapLimits._southWest.lng;
+  updateLimits = () => {
+    let mapLimits = this.leafletMap.leafletElement.getBounds();
+    let latNE = ( mapLimits._northEast.lat * 1000000000 ) / 1000000000;
+    let latSW = ( mapLimits._southWest.lat * 1000000000 ) / 1000000000;
+    let lngNE = ( mapLimits._northEast.lng * 1000000000 ) / 1000000000;
+    let lngSW = ( mapLimits._southWest.lng * 1000000000 ) / 1000000000;
     let latDelta = 0.25 * Math.abs( latNE - latSW );
     let lngDelta = 0.25 * Math.abs( lngNE - lngSW );
 
-    let bounds = { lat1: ( ( latNE * 1000000000 ) / 1000000000 ) + latDelta,
-                   lat2: ( ( latSW * 1000000000 ) / 1000000000 ) - latDelta,
-                   lng1: ( ( lngNE * 1000000000 ) / 1000000000 ) + lngDelta,
-                   lng2: ( ( lngSW * 1000000000 ) / 1000000000 ) - lngDelta };
+    let bounds = { lat1: ( latNE + latDelta ),
+                   lat2: ( latSW - latDelta ),
+                   lng1: ( lngNE + lngDelta ),
+                   lng2: ( lngSW - lngDelta ) };
 
-    if( !( JSON.stringify( bounds ) === JSON.stringify( this.state.bounds ) ) ) {
-      this.setState( { bounds: bounds } );
-      this.fetchMarkers( bounds );
-    };
+    ( !( JSON.stringify( bounds ) === JSON.stringify( this.state.bounds ) ) )
+    ? this.setState( { bounds: bounds, isRefreshing: ( this.state.isRefreshing + 1 ) }, this.fetchMarkers( bounds ) )
+    : null;
+  };
 
-  }
-
-  fetchMarkers( bounds ) {
-    this.setState( { isRefreshing: ( this.state.isRefreshing + 1 ) } );
+  fetchMarkers = ( bounds ) => {
     let url = `/api/markers/lat1=${ bounds.lat1 }&lat2=${ bounds.lat2 }&lng1=${ bounds.lng1 }&lng2=${ bounds.lng2 }`;
     $.get( url )
     .then( ( markers ) => {
       ( JSON.stringify( markers ) === JSON.stringify( this.state.markers ) )
-        ? this.setState( { isRefreshing: Math.max( this.state.isRefreshing - 1, 0 ) } )
-        : this.setState( { markers: markers, isRefreshing: Math.max( this.state.isRefreshing - 1, 0 ) } )
+      ? this.setState( { isRefreshing: this.state.isRefreshing - 1 } )
+      : this.setState( { markers: markers, isRefreshing: this.state.isRefreshing - 1 } )
     } )
     .catch( ( err ) => {
       console.log( { error: err.message } );
     } );
-  }
+  };
 
-  fetchFacilityData( NPRI_ID, latlng ) {
-    this.setState( { isRefreshing: ( this.state.isRefreshing + 1 ) } );
+  fetchFacilityData = ( NPRI_ID, latlng ) => {
     let url = `/api/facility/${ NPRI_ID }`;
     $.get( url )
     .then( ( facility ) => {
-      let parsedFacilityInfo = ParseFacilityInfo( facility );
-      this.setState( { facility: parsedFacilityInfo, infoPaneOpen: true, isRefreshing: Math.max( this.state.isRefreshing - 1, 0 ) } );
+      let parsedFacilityData = ParseFacilityData( facility );
+      this.setState( { facility: parsedFacilityData, facilityDataBoxOpen: true, isRefreshing: this.state.isRefreshing - 1 } );
     } )
     .then( this.moveToCoord( latlng.lat, latlng.lng ) )
     .catch( ( err ) => {
       console.log( { error: err.message } );
     } );
-  }
+  };
 
   render() {
-
     return (
       <div>
-        <Map ref='map'
-             animate={ true }
+        <Map zoom={ 11 }
              minZoom={ 8 }
              maxZoom={ 18 }
+             animate={ true }
              zoomControl={ false }
-             zoom={ 11 }
              center={ this.state.mapLocation }
+             ref={ map => { this.leafletMap = map } }
              maxBounds={ [ [ 41, -50 ], [ 84, -146 ] ] }
              onMoveEnd={ (evt) => { setTimeout( this.updateLimits, 250 ) } }
              onZoomEnd={ (evt) => { setTimeout( this.updateLimits, 250 ) } } >
@@ -156,8 +136,8 @@ export default class GoogleMap extends React.Component {
             <a role="button"
                title="Locate Me"
                aria-label="Locate Me"
-               className="leaflet-control-zoom-in muidocs-icon-custom-geo"
-               onClick={ () => this.getCurrentPosition() } style={ { fontSize: 18 } } />
+               onClick={ () => this.getCurrentPosition() }
+               className="leaflet-control-zoom-in muidocs-icon-custom-geo" />
           </Control>
 
           <LayersControl position='bottomright' >
@@ -173,18 +153,18 @@ export default class GoogleMap extends React.Component {
           </LayersControl>
 
           <MarkerClusterGroup markers={ this.state.markers }
-            wrapperOptions={ { enableDefaultStyle: true } }
-            onMarkerClick={ ( marker ) => { this.fetchFacilityData( marker.options.id, marker._latlng ) } } />
+                              wrapperOptions={ { enableDefaultStyle: true } }
+                              onMarkerClick={ ( marker ) => { this.setState( { isRefreshing: ( this.state.isRefreshing + 1 ) } ), this.fetchFacilityData( marker.options.id, marker._latlng ) } } />
 
         </Map>
 
         <Dialog modal={ false }
                 repositionOnUpdate={ true }
-                open={ this.state.infoPaneOpen }
-                onRequestClose={ this.closeInfoPane }
+                bodyStyle={ { padding: 0 } }
                 autoScrollBodyContent={ true }
-                bodyStyle={ { padding: 0 } } >
-          <FacilityInfo facility={ this.state.facility } />
+                open={ this.state.facilityDataBoxOpen }
+                onRequestClose={ this.closefacilityDataBox } >
+          <FacilityData facility={ this.state.facility } />
 
         </Dialog>
 
@@ -193,5 +173,6 @@ export default class GoogleMap extends React.Component {
 
       </div>
     )
-  }
-}
+  };
+
+};

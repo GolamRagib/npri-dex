@@ -1,6 +1,6 @@
 import Postal_Code_6_to_7 from './Postal_Code_6_to_7';
 
-export default function ParseFacilityInfo( facility ) {
+export default function ParseFacilityData( facility ) {
   let tableData = [];
 
   facility.NPRI_ID 
