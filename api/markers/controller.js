@@ -20,8 +20,8 @@ exports.markers = function(req, res) {
   .exec( function( err, records ) {
     let apiResponse = [];
     records.map( ( record ) => {
-      let apiResponseRecord = {};
-      let apiResponseRecordOptions = {};
+      let apiResponseRecord = new Object();
+      let apiResponseRecordOptions = new Object();
 
       apiResponseRecordOptions.id = record._id;
 

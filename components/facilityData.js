@@ -4,7 +4,7 @@ import { Table,
          TableBody,
          TableRowColumn } from 'material-ui/Table';
 
-const FacilityInfo = ( { facility } ) => {
+const FacilityData = ( { facility } ) => {
   return (
     <Table selectable={ false } >
       <TableBody displayRowCheckbox={ false }
@@ -21,4 +21,4 @@ const FacilityInfo = ( { facility } ) => {
   )
 };
 
-export default FacilityInfo;
+export default FacilityData;

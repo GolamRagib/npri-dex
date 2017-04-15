@@ -7,6 +7,7 @@ let webpackMiddleware = require( 'webpack-dev-middleware' );
 
 dotenv.config();
 
+mongoose.Promise = global.Promise;
 // mongoose.connect( 'mongodb://localhost:27017/npri' );
 mongoose.connect( process.env.MONGODB_SERVER );
 

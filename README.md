@@ -16,7 +16,6 @@ Getting started
 2. Import the database into MongoDB
 3. Create a `.env` file with the following variables:
     - MONGODB_SERVER
-    - WEBPACK_CONFIG
     - GOOGLE_MAPS_API_KEY
 4. Run `npm install` to install packages
 5. Run `npm i -g nodemon` to install nodemon
