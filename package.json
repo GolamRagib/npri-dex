@@ -48,6 +48,6 @@
     "webpack-dev-middleware": "^1.8.4"
   },
   "engines": {
-    "node": ">=6.10.2"
+    "node": ">=6.10.0 <7"
   }
 }
