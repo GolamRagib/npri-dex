@@ -1,12 +1,11 @@
+let dotenv = require( 'dotenv' );
 let express = require( 'express' );
-let bodyParser = require( 'body-parser' );
-
 let webpack = require( 'webpack' );
+let mongoose = require( 'mongoose' );
+let bodyParser = require( 'body-parser' );
 let webpackMiddleware = require( 'webpack-dev-middleware' );
 
-let mongoose = require( 'mongoose' );
-
-require( 'dotenv' ).config();
+dotenv.config();
 
 // mongoose.connect( 'mongodb://localhost:27017/npri' );
 mongoose.connect( process.env.MONGODB_SERVER );
@@ -15,7 +14,11 @@ let app = express();
 
 app.use( bodyParser.json() );
 
-app.use( webpackMiddleware( webpack( require( process.env.WEBPACK_CONFIG ) ) ) );
+let WEBPACK_CONFIG = ( process.env.NODE_ENV === 'production' )
+                     ? './webpack.config.js'
+                     : './webpack.dev.config.js' ;
+
+app.use( webpackMiddleware( webpack( require( WEBPACK_CONFIG ) ) ) );
 
 app.enable( 'trust proxy' );
 
@@ -32,4 +35,7 @@ app.use( '/api/facility', require( './api/facility/index' ) );
 
 app.get( '*', ( req, res ) => res.sendFile( __dirname + '/public/index.html' ) )
 
-app.listen( process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080, process.env.OPENSHIFT_NODEJS_IP || process.env.IP || '0.0.0.0' );
+let port = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080;
+let host = process.env.OPENSHIFT_NODEJS_IP   || process.env.IP   || '0.0.0.0';
+
+app.listen( port, host );
