@@ -160,8 +160,8 @@ export default class GoogleMap extends React.Component {
 
         <Dialog modal={ false }
                 repositionOnUpdate={ true }
-                bodyStyle={ { padding: 0 } }
                 autoScrollBodyContent={ true }
+                bodyClassName="facility-data-box"
                 open={ this.state.facilityDataBoxOpen }
                 onRequestClose={ this.closefacilityDataBox } >
           <FacilityData facility={ this.state.facility } />

@@ -87,6 +87,10 @@ html, body {
   content: "\E1B7";
 }
 
+.facility-data-box {
+  padding: 0 !important;
+}
+
 .outPopUp {
   position: absolute;
   width: 200px;
