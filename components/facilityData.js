@@ -12,8 +12,8 @@ const FacilityData = ( { facility } ) => {
                   stripedRows={ false } >
         { facility.map( ( row, index ) => (
           <TableRow key={ index } >
-            <TableRowColumn style={ { whiteSpace: 'pre-line', wordWrap: 'break-word' } } >{ row.name }</TableRowColumn>
-            <TableRowColumn style={ { whiteSpace: 'pre-line', wordWrap: 'break-word' } } >{ row.text }</TableRowColumn>
+            <TableRowColumn style={ { whiteSpace: 'pre-line', wordWrap: 'break-word' } } >{ row.label }</TableRowColumn>
+            <TableRowColumn style={ { whiteSpace: 'pre-line', wordWrap: 'break-word' } } >{ row.data }</TableRowColumn>
           </TableRow>
         ))}
       </TableBody>
