@@ -1,5 +1,6 @@
-const webpack = require( 'webpack' );
-const dotenv = require( 'dotenv-webpack' );
+let webpack = require( 'webpack' );
+let dotenv = require( 'dotenv-webpack' );
+let CompressionPlugin = require( 'compression-webpack-plugin' );
 
 module.exports =
 { devtool: 'cheap-module-source-map',
@@ -10,6 +11,13 @@ module.exports =
   plugins: [
     new dotenv( {
       path: './.env'
+    } ),
+    new CompressionPlugin( {
+      asset: "[path].gz[query]",
+      algorithm: "gzip",
+      test: /\.js$|\.css$|\.html$/,
+      threshold: 10240,
+      minRatio: 0.8
     } )
   ],
   module: {

@@ -3,6 +3,7 @@ let express = require( 'express' );
 let webpack = require( 'webpack' );
 let mongoose = require( 'mongoose' );
 let bodyParser = require( 'body-parser' );
+let compression = require( 'compression' );
 let webpackMiddleware = require( 'webpack-dev-middleware' );
 
 dotenv.config();
@@ -14,6 +15,8 @@ mongoose.connect( process.env.MONGODB_SERVER );
 let app = express();
 
 app.use( bodyParser.json() );
+
+app.use( compression() );
 
 let WEBPACK_CONFIG = ( process.env.NODE_ENV === 'production' )
                      ? './webpack.config.js'
@@ -27,6 +30,12 @@ app.use( function ( req, res, next ) {
   ( ( process.env.NODE_ENV === 'production' ) && ( req.secure === false ) )
   ? ( res.redirect( `https://${ req.headers.host }${ req.url }` ), next() )
   : next() ;
+});
+
+app.get('*.js', function (req, res, next) {
+  req.url = req.url + '.gz';
+  res.set('Content-Encoding', 'gzip');
+  next();
 });
 
 app.use( express.static( 'public' ) );
