@@ -93,11 +93,9 @@ export default class GoogleMap extends React.Component {
   fetchMarkers = ( bounds ) => {
     let url = `/api/markers/lat1=${ bounds.lat1 }&lat2=${ bounds.lat2 }&lng1=${ bounds.lng1 }&lng2=${ bounds.lng2 }`;
     $.get( url )
-    .then( ( apiResponseObject ) => {
-      let apiResponseArray = [];
+    .then( ( response ) => {
       let markers = [];
-      apiResponseArray = apiResponseObject;
-      apiResponseArray.map( ( record ) => { markers.push( { lat: record.loc.coordinates[1], lng: record.loc.coordinates[0], options: { id: record._id } } ) } );
+      response.map( ( record ) => { markers.push( { lat: record.loc.coordinates[1], lng: record.loc.coordinates[0], options: { id: record._id } } ) } );
       ( JSON.stringify( markers ) === JSON.stringify( this.state.markers ) )
       ? this.setState( { isRefreshing: this.state.isRefreshing - 1 } )
       : this.setState( { markers: markers, isRefreshing: this.state.isRefreshing - 1 } )
