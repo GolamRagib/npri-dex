@@ -17,22 +17,7 @@ exports.markers = function(req, res) {
   .find( { loc: { $geoWithin: { $box : box } } } )
   .select( 'loc' )
   .lean( true )
-  .exec( function( err, records ) {
-    let apiResponse = [];
-    records.map( ( record ) => {
-      let apiResponseRecord = new Object();
-      let apiResponseRecordOptions = new Object();
-
-      apiResponseRecordOptions.id = record._id;
-
-      apiResponseRecord.lat = record.loc.coordinates[1];
-      apiResponseRecord.lng = record.loc.coordinates[0];
-      apiResponseRecord.options = apiResponseRecordOptions;
-
-      apiResponse.push( apiResponseRecord );
-    })
-    err 
-      ? ( res.status( 404 ), res.send( err ) ) 
-      : res.send( apiResponse );
+  .exec( function( err, markers ) {
+    err ? ( res.status( 404 ), res.send( err ) ) : res.send( markers );
   } )
 }
