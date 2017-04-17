@@ -20,9 +20,9 @@ import ParseFacilityData from './parseFacilityData';
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions( {
-  iconUrl: require( 'leaflet/dist/images/marker-icon.png' ),
-  iconRetinaUrl: require( 'leaflet/dist/images/marker-icon-2x.png' ),
-  shadowUrl: require( 'leaflet/dist/images/marker-shadow.png' ),
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/images/marker-icon.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/images/marker-icon-2x.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/images/marker-shadow.png',
 } );
 
 const { BaseLayer } = LayersControl;
