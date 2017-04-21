@@ -32,10 +32,9 @@ app.use( function ( req, res, next ) {
   : next() ;
 });
 
-app.get( '*.js', function ( req, res, next ) {
+app.get( '/bundle.js', function ( req, res, next ) {
   req.url = req.url + '.gz';
   res.set( 'Content-Encoding', 'gzip' );
-  res.set( 'Content-Type', 'application/javascript' );
   next();
 });
 
@@ -44,7 +43,7 @@ app.use( express.static( 'public' ) );
 app.use( '/api/markers', require( './api/markers/index' ) );
 app.use( '/api/facility', require( './api/facility/index' ) );
 
-app.get( '*', ( req, res ) => { res.sendFile( __dirname + '/public/index.html' ); } )
+app.get( '*', ( req, res ) => { res.sendFile( `${ __dirname }/public/index.html` ); } )
 
 let port = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080;
 let host = process.env.OPENSHIFT_NODEJS_IP   || process.env.IP   || '0.0.0.0';
