@@ -73,10 +73,12 @@ export default class GoogleMap extends React.Component {
 
   updateLimits = () => {
     let mapLimits = this.leafletMap.leafletElement.getBounds();
-    let latNE = ( mapLimits._northEast.lat * 1000000000 ) / 1000000000;
-    let latSW = ( mapLimits._southWest.lat * 1000000000 ) / 1000000000;
-    let lngNE = ( mapLimits._northEast.lng * 1000000000 ) / 1000000000;
-    let lngSW = ( mapLimits._southWest.lng * 1000000000 ) / 1000000000;
+
+    let latNE = mapLimits._northEast.lat;
+    let latSW = mapLimits._southWest.lat;
+    let lngNE = mapLimits._northEast.lng;
+    let lngSW = mapLimits._southWest.lng;
+
     let latDelta = 0.25 * Math.abs( latNE - latSW );
     let lngDelta = 0.25 * Math.abs( lngNE - lngSW );
 
@@ -93,9 +95,7 @@ export default class GoogleMap extends React.Component {
   fetchMarkers = ( bounds ) => {
     let url = `/api/markers/lat1=${ bounds.lat1 }&lat2=${ bounds.lat2 }&lng1=${ bounds.lng1 }&lng2=${ bounds.lng2 }`;
     $.get( url )
-    .then( ( response ) => {
-      let markers = [];
-      response.map( ( record ) => { markers.push( { lat: record.loc.coordinates[1], lng: record.loc.coordinates[0], options: { id: record._id } } ) } );
+    .then( ( markers ) => {
       ( JSON.stringify( markers ) === JSON.stringify( this.state.markers ) )
       ? this.setState( { isRefreshing: this.state.isRefreshing - 1 } )
       : this.setState( { markers: markers, isRefreshing: this.state.isRefreshing - 1 } )
@@ -105,14 +105,14 @@ export default class GoogleMap extends React.Component {
     } );
   };
 
-  fetchFacilityData = ( NPRI_ID, latlng ) => {
-    let url = `/api/facility/${ NPRI_ID }`;
+  fetchFacilityData = ( marker ) => {
+    let url = `/api/facility/${ marker.options.id }`;
     $.get( url )
     .then( ( facility ) => {
       let parsedFacilityData = ParseFacilityData( facility );
       this.setState( { facility: parsedFacilityData, facilityDataBoxOpen: true, isRefreshing: this.state.isRefreshing - 1 } );
     } )
-    .then( this.moveToCoord( latlng.lat, latlng.lng ) )
+    .then( this.moveToCoord( marker._latlng.lat, marker._latlng.lng ) )
     .catch( ( err ) => {
       console.log( { error: err.message } );
     } );
@@ -129,8 +129,8 @@ export default class GoogleMap extends React.Component {
              center={ this.state.mapLocation }
              ref={ map => { this.leafletMap = map } }
              maxBounds={ [ [ 41, -50 ], [ 84, -146 ] ] }
-             onMoveEnd={ (evt) => { setTimeout( this.updateLimits, 250 ) } }
-             onZoomEnd={ (evt) => { setTimeout( this.updateLimits, 250 ) } } >
+             onMoveEnd={ (evt) => { setTimeout( this.updateLimits, 150 ) } }
+             onZoomEnd={ (evt) => { setTimeout( this.updateLimits, 150 ) } } >
 
           <ZoomControl position='bottomleft' />
 
@@ -143,7 +143,13 @@ export default class GoogleMap extends React.Component {
           </Control>
 
           <LayersControl position='bottomright' >
-            <BaseLayer checked name='Google Maps Roads' >
+            <BaseLayer name='CartoDB.Positron' checked >
+              <TileLayer  url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"/>
+            </BaseLayer>
+            <BaseLayer name='Stamen.Terrain'>
+              <TileLayer  url="https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png"/>
+            </BaseLayer>
+            <BaseLayer name='Google Maps Roads' >
               <GoogleLayer googlekey={ key } maptype={ road } />
             </BaseLayer>
             <BaseLayer name='Google Maps Satellite' >
@@ -154,9 +160,9 @@ export default class GoogleMap extends React.Component {
             </BaseLayer>
           </LayersControl>
 
-          <MarkerClusterGroup markers={ this.state.markers }
-                              wrapperOptions={ { enableDefaultStyle: true } }
-                              onMarkerClick={ ( marker ) => { this.setState( { isRefreshing: ( this.state.isRefreshing + 1 ) } ), this.fetchFacilityData( marker.options.id, marker._latlng ) } } />
+          <MarkerClusterGroup wrapperOptions={ { enableDefaultStyle: true } }
+                              onMarkerClick={ ( marker ) => { this.setState( { isRefreshing: ( this.state.isRefreshing + 1 ) } ), this.fetchFacilityData( marker ) } }
+                              markers={ this.state.markers.map( ( marker ) => ( { lat: marker.loc.coordinates[1], lng: marker.loc.coordinates[0], options: { id: marker._id } } ) ) } />
 
         </Map>
 

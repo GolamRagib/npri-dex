@@ -18,7 +18,7 @@ app.use( bodyParser.json() );
 
 app.use( compression() );
 
-let WEBPACK_CONFIG = ( process.env.NODE_ENV === 'production' )
+let WEBPACK_CONFIG = ( [ 'production', 'testing' ].includes( process.env.NODE_ENV ) )
                      ? './webpack.config.js'
                      : './webpack.dev.config.js' ;
 
