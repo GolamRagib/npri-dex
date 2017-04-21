@@ -4,6 +4,7 @@ self.addEventListener( 'install', function( e ) {
     return cache.addAll( [
       '/',
       '/bundle.js',
+      '/cache-polyfill.js',
       '/favicon.ico',
       '/index.html',
       '/manifest.json',
