@@ -38,7 +38,7 @@ const markers = [
   { lat: 83.500, lng: -145.50, options: { id: 'NW limit' } },
 ]; // for testing only
 
-export default class GoogleMap extends React.Component {
+export default class MapComponent extends React.Component {
 
   constructor() {
     super();
@@ -142,22 +142,24 @@ export default class GoogleMap extends React.Component {
                className="leaflet-control-zoom-in muidocs-icon-custom-geo" />
           </Control>
 
-          <LayersControl position='bottomright' >
-            <BaseLayer name='CartoDB.Positron' checked >
-              <TileLayer  url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"/>
+          <LayersControl position="bottomright" >
+            <BaseLayer name="CartoDB.Positron" checked >
+              <TileLayer  url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
+                          attribution="&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> &copy; <a href='http://cartodb.com/attributions'>CartoDB</a>" />
             </BaseLayer>
-            <BaseLayer name='Stamen.Terrain'>
-              <TileLayer  url="https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png"/>
+            <BaseLayer name="Stamen.Terrain" >
+              <TileLayer  url="https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png"
+                          attribution="Map tiles by <a href='http://stamen.com'>Stamen Design</a>, <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a> &mdash; Map data &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>" />
+            </BaseLayer>{/*
+            <BaseLayer name='Google Maps Roads' >
+              <GoogleLayer googlekey={ key } maptype={ road } />
             </BaseLayer>
-{/*            // <BaseLayer name='Google Maps Roads' >
-            //   <GoogleLayer googlekey={ key } maptype={ road } />
-            // </BaseLayer>
-            // <BaseLayer name='Google Maps Satellite' >
-            //   <GoogleLayer googlekey={ key } maptype={ satellite } />
-            // </BaseLayer>
-            // <BaseLayer name='Google Maps Terrain' >
-            //   <GoogleLayer googlekey={ key } maptype={ terrain } />
-            // </BaseLayer>*/}
+            <BaseLayer name='Google Maps Satellite' >
+              <GoogleLayer googlekey={ key } maptype={ satellite } />
+            </BaseLayer>
+            <BaseLayer name='Google Maps Terrain' >
+              <GoogleLayer googlekey={ key } maptype={ terrain } />
+            </BaseLayer>*/}
           </LayersControl>
 
           <MarkerClusterGroup wrapperOptions={ { enableDefaultStyle: true } }

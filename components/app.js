@@ -1,15 +1,14 @@
 import React from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import GoogleMap from "./googleMap";
-
 import AppBarX from './appBarX';
+import MapComponent from "./mapComponent";
 
 export default class App extends React.Component {
   render() {
     return <MuiThemeProvider>
       <div>
         <AppBarX />
-        <GoogleMap />
+        <MapComponent />
       </div>
     </MuiThemeProvider>
   }
