@@ -1,6 +1,6 @@
 importScripts( '/cache-polyfill.js' );
 self.addEventListener( 'install', function( e ) {
-  e.waitUntil( caches.open( 'airhorner' ).then( function( cache ) {
+  e.waitUntil( caches.open( 'npri-dex' ).then( function( cache ) {
     return cache.addAll( [
       '/',
       '/bundle.js',
