@@ -11,7 +11,7 @@ import { Map,
          ZoomControl,
          LayersControl }  from 'react-leaflet';
 import Control            from 'react-leaflet-control';
-import GoogleLayer        from './googleMaps/googleLayer';
+// import GoogleLayer        from './googleMaps/googleLayer';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 
 import FacilityData      from './facilityData';
@@ -26,10 +26,10 @@ L.Icon.Default.mergeOptions( {
 } );
 
 const { BaseLayer } = LayersControl;
-const key = process.env.GOOGLE_MAPS_API_KEY;
-const terrain = 'TERRAIN';
-const road = 'ROADMAP';
-const satellite = 'SATELLITE';
+// const key = process.env.GOOGLE_MAPS_API_KEY;
+// const terrain = 'TERRAIN';
+// const road = 'ROADMAP';
+// const satellite = 'SATELLITE';
 
 const markers = [
   { lat: 41.500, lng: -50.500, options: { id: 'SE limit' } },
@@ -149,15 +149,15 @@ export default class GoogleMap extends React.Component {
             <BaseLayer name='Stamen.Terrain'>
               <TileLayer  url="https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png"/>
             </BaseLayer>
-            <BaseLayer name='Google Maps Roads' >
-              <GoogleLayer googlekey={ key } maptype={ road } />
-            </BaseLayer>
-            <BaseLayer name='Google Maps Satellite' >
-              <GoogleLayer googlekey={ key } maptype={ satellite } />
-            </BaseLayer>
-            <BaseLayer name='Google Maps Terrain' >
-              <GoogleLayer googlekey={ key } maptype={ terrain } />
-            </BaseLayer>
+{/*            // <BaseLayer name='Google Maps Roads' >
+            //   <GoogleLayer googlekey={ key } maptype={ road } />
+            // </BaseLayer>
+            // <BaseLayer name='Google Maps Satellite' >
+            //   <GoogleLayer googlekey={ key } maptype={ satellite } />
+            // </BaseLayer>
+            // <BaseLayer name='Google Maps Terrain' >
+            //   <GoogleLayer googlekey={ key } maptype={ terrain } />
+            // </BaseLayer>*/}
           </LayersControl>
 
           <MarkerClusterGroup wrapperOptions={ { enableDefaultStyle: true } }

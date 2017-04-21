@@ -4,6 +4,7 @@
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ac1f34",
+  "theme_color": "#ac1f34",
   "description": "Explore NPRI data",
   "icons": [ {
     "src": "/images/launcher-icon-0-75x.png",

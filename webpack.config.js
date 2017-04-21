@@ -2,8 +2,7 @@ let webpack = require( 'webpack' );
 let CompressionPlugin = require( 'compression-webpack-plugin' );
 
 module.exports =
-{ devtool: 'cheap-module-source-map',
-  entry: "./entry.js",
+{ entry: "./entry.js",
   output:
   { path: "/",
     filename: "bundle.js" },
