@@ -22,15 +22,6 @@ module.exports =
       test: /\.js$|\.css$|\.html$/,
       threshold: 10240,
       minRatio: 0.8
-    } ),
-    new webpack.optimize.CommonsChunkPlugin ({
-      names: [ 'vendor', 'manifest' ],
-      minChunks: Infinity
-    } ),
-    new webpack.optimize.CommonsChunkPlugin( {
-      async: true,
-      children: true,
-      minChunks: 4
     } )
   ],
   module: {
