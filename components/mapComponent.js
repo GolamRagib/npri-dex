@@ -6,10 +6,15 @@ import Dialog           from 'material-ui/Dialog';
 import Snackbar         from 'material-ui/Snackbar';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 
-import { Map,
+import { Circle,
+         CircleMarker,
+         LayersControl,
+         LayerGroup,
+         Map,
+         Marker,
          TileLayer,
-         ZoomControl,
-         LayersControl }  from 'react-leaflet';
+         ZoomControl, } from 'react-leaflet';
+
 import Control            from 'react-leaflet-control';
 // import GoogleLayer        from './googleMaps/googleLayer';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
@@ -25,7 +30,7 @@ L.Icon.Default.mergeOptions( {
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/images/marker-shadow.png',
 } );
 
-const { BaseLayer } = LayersControl;
+const { BaseLayer, Overlay } = LayersControl;
 // const key = process.env.GOOGLE_MAPS_API_KEY;
 // const terrain = 'TERRAIN';
 // const road = 'ROADMAP';
@@ -46,8 +51,9 @@ export default class MapComponent extends React.Component {
       markers: [],
       facility: {},
       isRefreshing: 0,
+      locationPermission: false,
       facilityDataBoxOpen: false,
-      mapLocation: [ 43.6482644, -79.3978587 ],
+      mapLocation: [ 43.6482644, -79.3978587, 0 ],
       bounds: { lat1: '', lat2: '', lng1: '', lng2: '' }
     };
   };
@@ -61,7 +67,9 @@ export default class MapComponent extends React.Component {
 
   getCurrentPosition = () => {
     navigator.geolocation.getCurrentPosition( ( position ) => {
-      this.moveToCoord( position.coords.latitude, position.coords.longitude );
+      this.setState( { mapLocation: [ position.coords.latitude, position.coords.longitude, position.coords.accuracy ],
+                       locationPermission: true },
+                     this.moveToCoord( ...this.state.mapLocation ) );
     } );
     setTimeout( this.updateLimits, 250 );
   };
@@ -150,8 +158,8 @@ export default class MapComponent extends React.Component {
             <BaseLayer name="Stamen.Terrain" >
               <TileLayer  url="https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png"
                           attribution="Map tiles by <a href='http://stamen.com'>Stamen Design</a>, <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a> &mdash; Map data &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>" />
-            </BaseLayer>{/*
-            <BaseLayer name='Google Maps Roads' >
+            </BaseLayer>
+            {/*<BaseLayer name='Google Maps Roads' >
               <GoogleLayer googlekey={ key } maptype={ road } />
             </BaseLayer>
             <BaseLayer name='Google Maps Satellite' >
@@ -160,6 +168,34 @@ export default class MapComponent extends React.Component {
             <BaseLayer name='Google Maps Terrain' >
               <GoogleLayer googlekey={ key } maptype={ terrain } />
             </BaseLayer>*/}
+
+            { ( this.state.locationPermission === true )
+              ? <Overlay checked name="Current location">
+                  <LayerGroup>
+                    <CircleMarker center={ this.state.mapLocation }
+                                  interactive={ false }
+                                  fill="true"
+                                  color="white"
+                                  radius={ 10 }
+                                  stroke={ true }
+                                  fillOpacity={ 0.7 }
+                                  fillColor="#4285f4" />
+                    <CircleMarker center={ this.state.mapLocation }
+                                  interactive={ false }
+                                  radius={ 25 }
+                                  stroke={ false }
+                                  fillOpacity={ 0.1 }
+                                  fillColor="#4285f4" />
+                    <Circle center={ this.state.mapLocation }
+                            stroke={ false }
+                            fillColor="#4285f4"
+                            fillOpacity={ 0.1 }
+                            interactive={ false }
+                            radius={ this.state.mapLocation[2] } />
+                  </LayerGroup>
+                </Overlay>
+              : null }
+
           </LayersControl>
 
           <MarkerClusterGroup wrapperOptions={ { enableDefaultStyle: true } }
