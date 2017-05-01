@@ -19,23 +19,6 @@ ${ facility.ADDR_2 }`
           ? facility.ADDR_2
           : "" ;
 
-/*  let ADDR_2 = facility.CITY
-                ? facility.PROVINCE
-                  ? facility.POSTAL_CODE
-                    ? `${ facility.CITY }, ${ facility.PROVINCE } ${ Postal_Code_6_to_7( facility.POSTAL_CODE ) }`
-                    : `${ facility.CITY }, ${ facility.PROVINCE }`
-                  : facility.POSTAL_CODE
-                    ? `${ facility.CITY } ${ Postal_Code_6_to_7( facility.POSTAL_CODE ) }`
-                    : `${ facility.CITY }`
-                : facility.PROVINCE
-                  ? facility.POSTAL_CODE
-                    ? `${ facility.PROVINCE } ${ Postal_Code_6_to_7( facility.POSTAL_CODE ) }`
-                    : `${ facility.PROVINCE }`
-                  : facility.POSTAL_CODE
-                    ? `${ Postal_Code_6_to_7( facility.POSTAL_CODE ) }`
-                    : "";*/
-// There are probably much much much better ways of computing ADDR_2
-
   let ADDR_2 = "";
 
   if( facility.CITY ) { ADDR_2 += facility.CITY; };

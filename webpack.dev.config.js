@@ -36,5 +36,5 @@ module.exports =
       { test: /\.(woff2?|ttf|eot|jpe?g|png|gif|svg)$/,
         loader: 'url?limit=1' }
     ]
-  }
+  },
 };

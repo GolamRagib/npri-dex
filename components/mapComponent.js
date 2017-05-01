@@ -1,10 +1,10 @@
 import React from 'react';
-import $     from 'jquery';
+import _     from 'lodash';
 import L     from 'leaflet';
+import $     from 'jquery';
 
-import Dialog           from 'material-ui/Dialog';
-import Snackbar         from 'material-ui/Snackbar';
-import RefreshIndicator from 'material-ui/RefreshIndicator';
+import Dialog   from 'material-ui/Dialog';
+import Snackbar from 'material-ui/Snackbar';
 
 import { Circle,
          CircleMarker,
@@ -13,10 +13,9 @@ import { Circle,
          Map,
          Marker,
          TileLayer,
-         ZoomControl, } from 'react-leaflet';
+         ZoomControl } from 'react-leaflet';
 
 import Control            from 'react-leaflet-control';
-// import GoogleLayer        from './googleMaps/googleLayer';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 
 import FacilityData      from './facilityData';
@@ -31,96 +30,161 @@ L.Icon.Default.mergeOptions( {
 } );
 
 const { BaseLayer, Overlay } = LayersControl;
-// const key = process.env.GOOGLE_MAPS_API_KEY;
-// const terrain = 'TERRAIN';
-// const road = 'ROADMAP';
-// const satellite = 'SATELLITE';
-
-const markers = [
-  { lat: 41.500, lng: -50.500, options: { id: 'SE limit' } },
-  { lat: 41.500, lng: -145.50, options: { id: 'SW limit' } },
-  { lat: 83.500, lng: -50.500, options: { id: 'NE limit' } },
-  { lat: 83.500, lng: -145.50, options: { id: 'NW limit' } },
-]; // for testing only
 
 export default class MapComponent extends React.Component {
 
   constructor() {
     super();
     this.state = {
+      zoom: 11,
       markers: [],
       facility: {},
       isRefreshing: 0,
+      suppressHashChange: false,
       locationPermission: false,
-      facilityDataBoxOpen: false,
-      mapLocation: [ 43.6482644, -79.3978587, 0 ],
-      bounds: { lat1: '', lat2: '', lng1: '', lng2: '' }
+      displayFacilityData: false,
+      maxBounds: [ [ 41, -50 ], [ 84, -146 ] ],
+      mapCentre: { lat: 43.6482644, lng: -79.3978587 },
+      geoLocation: { lat: "", lng: "", accuracy: "" },
+      bounds: { latN: '', latS: '', lngE: '', lngW: '' }
     };
   };
-
-  closefacilityDataBox = () => this.setState( { facilityDataBoxOpen: false, facility: {} } );
 
   componentDidMount() {
-    setTimeout( this.updateLimits, 250 );
-    this.getCurrentPosition();
+    window.addEventListener( "hashchange", this.hashChangeDetected );
+    this.hashChangeDetected();
   };
+
+  hashChangeDetected = () => {
+    this.setState( { displayFacilityData: false, facility: {} }, this.parseURL )
+  }
+
+  parseURL = () => {
+    let rawHash = window.location.hash;
+    // if the URL does not contain a hash
+    if( rawHash.length === 0 ) {
+      //attempt to get current position
+      navigator.geolocation.getCurrentPosition(
+        // if successful, change hash to current location coordinates and suppress hash change on panning
+        ( position ) => this.setCurrentPosition( position ),
+        // if unsuccessful, change hash to default location coordinates and suppress hash change on panning
+        this.setState( { suppressHashChange: true },
+                         this.updateHash( { lat: 43.6482644, lng: -79.3978587, zoom: 11, facilityID: "" } ) ) );
+    } else {
+      // if the URL contains a hash, split hash into components and convert components to numbers where possible
+      let [ ,facilityID, lat, lng, zoom, ] = rawHash.split( /\s*\/|@|#|,|z\s*/ ).map( ( item ) => ( Number( item ) || item ) );
+      // if the hash contains a facilityID
+      if( facilityID ) {
+        // fetch facility details
+        let url = `/api/facility/${ facilityID }`;
+        $.get( url )
+        // if there is a valid response
+        .then( ( facility ) => {
+          // check if coordinates in hash match coordinates in facility details
+          if( ( lat === facility.loc.coordinates[1] ) &&
+              ( lng === facility.loc.coordinates[0] ) &&
+              ( _.inRange( zoom, 7.999, 18.001 ) ) ) {
+            // if coordinates match, set mapCentre to facility location coordinates, display facility data, and suppress hash change on panning
+            this.setState( { mapCentre: { lat: lat, lng: lng },
+                             zoom: zoom,
+                             facility: ParseFacilityData( facility ),
+                             suppressHashChange: true,
+                             displayFacilityData: true } )
+          } else {
+            // else change hash to correct facility coordinates
+            this.updateHash( { lat: facility.loc.coordinates[1],
+                               lng: facility.loc.coordinates[0],
+                               zoom: _.clamp( zoom, 8, 18 ),
+                               facilityID: facilityID } )
+          }
+        } )
+        // if the API returns an error, change hash to blank
+        .catch( ( err ) => {
+          window.location.replace( `${ window.location.pathname }` );
+          window.history.pushState( {} , "", "" );
+        } )
+      } else {
+        // fix zoom bounds
+        if( !( _.inRange( zoom, 7.999, 18.001 ) ) )
+            this.updateHash( { lat: lat, lng: lng, zoom: _.clamp( zoom, 8, 18 ), facilityID: "" } )
+        // else if the coordinates are inside the application map bounds, set mapCentre to coordinates in hash and suppress hash change on panning
+        else if( ( _.inRange( lat, this.state.maxBounds[0][0], this.state.maxBounds[1][0] ) ) &&
+                 ( _.inRange( lng, this.state.maxBounds[1][1], this.state.maxBounds[0][1] ) ) ) {
+          this.setState( { mapCentre: { lat: lat, lng: lng },
+                           zoom: zoom,
+                           suppressHashChange: true } )
+        } else {
+          // else change hash to blank
+          window.location.replace( `${ window.location.pathname }` );
+          window.history.pushState( {} , "", "" );
+        }
+      }
+    }
+  }
 
   getCurrentPosition = () => {
-    navigator.geolocation.getCurrentPosition( ( position ) => {
-      this.setState( { mapLocation: [ position.coords.latitude, position.coords.longitude, position.coords.accuracy ],
-                       locationPermission: true },
-                     this.moveToCoord( ...this.state.mapLocation ) );
-    } );
-    setTimeout( this.updateLimits, 250 );
+    navigator.geolocation.getCurrentPosition( ( position ) => this.setCurrentPosition( position ),
+    // replace this with something better
+    ( error ) => { if( error.code === 1 ) { window.alert( "Please enable location services to use this feature." ) }
+              else if( error.code === 2 ) { window.alert( "Geolocation is not supported for this Browser/OS.") }
+              else if( error.code === 3 ) { window.alert( "Unable to get your location.") } } );
   };
 
-  moveToCoord = ( lat, lng ) => {
-    this.leafletMap.leafletElement.panTo( { lat: lat, lng: lng } );
-    this.updateLimits();
-  };
+  setCurrentPosition = ( position ) => {
+    this.setState( { geoLocation: { lat: position.coords.latitude,
+                                    lng: position.coords.longitude,
+                                    accuracy: position.coords.accuracy },
+                      locationPermission: true,
+                      suppressHashChange: true },
+                    this.updateHash( { lat: position.coords.latitude, lng: position.coords.longitude, zoom: this.state.zoom, facilityID: "" } ) ) }
 
-  updateLimits = () => {
-    let mapLimits = this.leafletMap.leafletElement.getBounds();
+  updateHash = ( newHash ) => {
+    window.location.replace    ( `${ window.location.pathname }#${ newHash.facilityID }@${ newHash.lat },${ newHash.lng },${ newHash.zoom }z` );
+    window.history.pushState   ( {} , "",                     `#${ newHash.facilityID }@${ newHash.lat },${ newHash.lng },${ newHash.zoom }z` );
+  }
 
-    let latNE = mapLimits._northEast.lat;
-    let latSW = mapLimits._southWest.lat;
-    let lngNE = mapLimits._northEast.lng;
-    let lngSW = mapLimits._southWest.lng;
+  updateBounds = () => {
+    if( this.state.suppressHashChange === true ) {
+      // get map bounds
+      this.setState( { suppressHashChange: false },
+                     () => { let mapLimits = this.refs.map.leafletElement.getBounds();
 
-    let latDelta = 0.25 * Math.abs( latNE - latSW );
-    let lngDelta = 0.25 * Math.abs( lngNE - lngSW );
+                             let latNE = mapLimits._northEast.lat;
+                             let latSW = mapLimits._southWest.lat;
+                             let lngNE = mapLimits._northEast.lng;
+                             let lngSW = mapLimits._southWest.lng;
 
-    let bounds = { lat1: ( latNE + latDelta ),
-                   lat2: ( latSW - latDelta ),
-                   lng1: ( lngNE + lngDelta ),
-                   lng2: ( lngSW - lngDelta ) };
+                             let latDelta = 0.25 * Math.abs( latNE - latSW );
+                             let lngDelta = 0.25 * Math.abs( lngNE - lngSW );
 
-    if ( !( JSON.stringify( bounds ) === JSON.stringify( this.state.bounds ) ) ) {
-      this.setState( { bounds: bounds, isRefreshing: ( this.state.isRefreshing + 1 ) }, this.fetchMarkers( bounds ) )
-    };
+                             // expand map bounds
+                             let bounds = { latN: ( latNE + latDelta ),
+                                           latS: ( latSW - latDelta ),
+                                           lngE: ( lngNE + lngDelta ),
+                                           lngW: ( lngSW - lngDelta ) };
+
+                             // if map bounds have not changed, then fetch markers
+                             if ( !( JSON.stringify( bounds ) === JSON.stringify( this.state.bounds ) ) ) {
+                               this.setState( { bounds: bounds,
+                                                isRefreshing: ( this.state.isRefreshing + 1 ) },
+                                              this.fetchMarkers( bounds ) )
+                             }
+                           } )
+    } else {
+      let mapCenter = this.refs.map.leafletElement.getCenter();
+      this.updateHash( { lat: mapCenter.lat, lng: mapCenter.lng, zoom: this.refs.map.leafletElement._zoom, facilityID: "" } );
+    }
   };
 
   fetchMarkers = ( bounds ) => {
-    let url = `/api/markers/lat1=${ bounds.lat1 }&lat2=${ bounds.lat2 }&lng1=${ bounds.lng1 }&lng2=${ bounds.lng2 }`;
+    let url = `/api/markers/latN=${ bounds.latN }&latS=${ bounds.latS }&lngE=${ bounds.lngE }&lngW=${ bounds.lngW }`;
     $.get( url )
     .then( ( markers ) => {
       ( JSON.stringify( markers ) === JSON.stringify( this.state.markers ) )
       ? this.setState( { isRefreshing: this.state.isRefreshing - 1 } )
-      : this.setState( { markers: markers, isRefreshing: this.state.isRefreshing - 1 } )
+      : this.setState( { markers: markers,
+                         isRefreshing: this.state.isRefreshing - 1 } )
     } )
-    .catch( ( err ) => {
-      console.log( { error: err.message } );
-    } );
-  };
-
-  fetchFacilityData = ( marker ) => {
-    let url = `/api/facility/${ marker.options.id }`;
-    $.get( url )
-    .then( ( facility ) => {
-      let parsedFacilityData = ParseFacilityData( facility );
-      this.setState( { facility: parsedFacilityData, facilityDataBoxOpen: true, isRefreshing: this.state.isRefreshing - 1 } );
-    } )
-    .then( this.moveToCoord( marker._latlng.lat, marker._latlng.lng ) )
     .catch( ( err ) => {
       console.log( { error: err.message } );
     } );
@@ -128,17 +192,16 @@ export default class MapComponent extends React.Component {
 
   render() {
     return (
-      <div>
-        <Map zoom={ 11 }
+        <Map zoom={ this.state.zoom }
              minZoom={ 8 }
              maxZoom={ 18 }
              animate={ true }
              zoomControl={ false }
-             center={ this.state.mapLocation }
-             ref={ map => { this.leafletMap = map } }
-             maxBounds={ [ [ 41, -50 ], [ 84, -146 ] ] }
-             onMoveEnd={ (evt) => { setTimeout( this.updateLimits, 150 ) } }
-             onZoomEnd={ (evt) => { setTimeout( this.updateLimits, 150 ) } } >
+             center={ this.state.mapCentre }
+             ref="map"
+             maxBounds={ this.state.maxBounds }
+             onMoveEnd={ _.debounce( (evt) => { this.updateBounds() }, 100, { leading: false, trailing: true } ) }
+             onZoomEnd={ _.debounce( (evt) => { this.updateBounds() }, 100, { leading: false, trailing: true } ) } >
 
           <ZoomControl position='bottomleft' />
 
@@ -146,7 +209,7 @@ export default class MapComponent extends React.Component {
             <a role="button"
                title="Locate Me"
                aria-label="Locate Me"
-               onClick={ () => this.getCurrentPosition() }
+               onClick={ ( evt ) => { this.getCurrentPosition() } }
                className="leaflet-control-zoom-in muidocs-icon-custom-geo" />
           </Control>
 
@@ -159,65 +222,71 @@ export default class MapComponent extends React.Component {
               <TileLayer  url="https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png"
                           attribution="Map tiles by <a href='http://stamen.com'>Stamen Design</a>, <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a> &mdash; Map data &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>" />
             </BaseLayer>
-            {/*<BaseLayer name='Google Maps Roads' >
-              <GoogleLayer googlekey={ key } maptype={ road } />
-            </BaseLayer>
-            <BaseLayer name='Google Maps Satellite' >
-              <GoogleLayer googlekey={ key } maptype={ satellite } />
-            </BaseLayer>
-            <BaseLayer name='Google Maps Terrain' >
-              <GoogleLayer googlekey={ key } maptype={ terrain } />
-            </BaseLayer>*/}
-
-            { ( this.state.locationPermission === true )
+            { ( this.state.locationPermission )
               ? <Overlay checked name="Current location">
                   <LayerGroup>
-                    <CircleMarker center={ this.state.mapLocation }
-                                  interactive={ false }
+                    <CircleMarker center={ this.state.geoLocation }
+                                  onClick={ ( evt ) => { this.getCurrentPosition() } }
                                   fill="true"
                                   color="white"
                                   radius={ 10 }
                                   stroke={ true }
                                   fillOpacity={ 0.7 }
                                   fillColor="#4285f4" />
-                    <CircleMarker center={ this.state.mapLocation }
-                                  interactive={ false }
+                    <CircleMarker center={ this.state.geoLocation }
+                                  onClick={ ( evt ) => { this.getCurrentPosition() } }
                                   radius={ 25 }
                                   stroke={ false }
                                   fillOpacity={ 0.1 }
                                   fillColor="#4285f4" />
-                    <Circle center={ this.state.mapLocation }
+                    <Circle center={ this.state.geoLocation }
+                            onClick={ ( evt ) => { this.getCurrentPosition() } }
                             stroke={ false }
                             fillColor="#4285f4"
                             fillOpacity={ 0.1 }
-                            interactive={ false }
-                            radius={ this.state.mapLocation[2] } />
+                            radius={ this.state.geoLocation.accuracy } />
                   </LayerGroup>
                 </Overlay>
-              : null }
-
+              : null
+            }
           </LayersControl>
 
           <MarkerClusterGroup wrapperOptions={ { enableDefaultStyle: true } }
-                              onMarkerClick={ ( marker ) => { this.setState( { isRefreshing: ( this.state.isRefreshing + 1 ) } ), this.fetchFacilityData( marker ) } }
-                              markers={ this.state.markers.map( ( marker ) => ( { lat: marker.loc.coordinates[1], lng: marker.loc.coordinates[0], options: { id: marker._id } } ) ) } />
+                              onMarkerClick={ _.debounce( ( marker ) => { this.setState( { suppressHashChange: true },
+                                                                                         this.updateHash( { lat: marker._latlng.lat,
+                                                                                                            lng: marker._latlng.lng,
+                                                                                                            zoom: this.state.zoom,
+                                                                                                            facilityID: marker.options.id } ) ),
+                                                                          100,
+                                                                          { leading: false,
+                                                                            trailing: true }
+                                                                        } )
+                                            }
+                              markers={ this.state.markers.map( ( marker ) => ( { lat: marker.loc.coordinates[1],
+                                                                                  lng: marker.loc.coordinates[0],
+                                                                                  options: { id: marker._id }
+                                                                                } ) )
+                                      } />
 
-        </Map>
+          <Dialog modal={ false }
+                  repositionOnUpdate={ true }
+                  autoScrollBodyContent={ true }
+                  bodyClassName="facility-data-box"
+                  open={ this.state.displayFacilityData }
+                  onRequestClose={ () => { this.updateHash( { lat: this.state.mapCentre.lat,
+                                                              lng: this.state.mapCentre.lng,
+                                                              zoom: this.state.zoom,
+                                                              facilityID: ""
+                                                            } )
+                                         }
+                                 } >
+            <FacilityData facility={ this.state.facility } />
+          </Dialog>
 
-        <Dialog modal={ false }
-                repositionOnUpdate={ true }
-                autoScrollBodyContent={ true }
-                bodyClassName="facility-data-box"
-                open={ this.state.facilityDataBoxOpen }
-                onRequestClose={ this.closefacilityDataBox } >
-          <FacilityData facility={ this.state.facility } />
-
-        </Dialog>
-
-        <Snackbar open={ !!this.state.isRefreshing } /* the magical cast-to-bool! */
+          <Snackbar open={ !!this.state.isRefreshing }
                   message={ "Fetching data" } />
 
-      </div>
+        </Map>
     )
   };
 

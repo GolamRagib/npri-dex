@@ -20,6 +20,9 @@ html, body {
   display: flex;
   padding-left: 24px;
   padding-right: 24px;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 .static-nav-bar-button {
@@ -73,7 +76,10 @@ html, body {
   width: 100%;
   margin: 0 auto;
   position: fixed;
+  top: 64;
   bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .muidocs-icon-custom-code:before {

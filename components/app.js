@@ -1,13 +1,13 @@
 import React from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import AppBarX from './appBarX';
+import TopBar from './topBar';
 import MapComponent from "./mapComponent";
 
 export default class App extends React.Component {
   render() {
     return <MuiThemeProvider>
       <div>
-        <AppBarX />
+        <TopBar />
         <MapComponent />
       </div>
     </MuiThemeProvider>
