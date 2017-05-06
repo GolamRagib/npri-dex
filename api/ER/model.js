@@ -1,8 +1,6 @@
-let mongoose = require('mongoose');
+const mongoose = require( 'mongoose' );
+const unilingualName = require( '../unilingualName/schema.js' );
 
-let ERSchema = new mongoose.Schema( {
-  ID: Number, 
-  NAME: String
-}, { collection: 'ER' } );
+const ERSchema = new mongoose.Schema( unilingualName, { collection: 'ER' } );
 
 module.exports = mongoose.model( 'ER', ERSchema );

@@ -10,14 +10,7 @@ export default function ParseFacilityData( facility ) {
     if( facility[ item.name ] ) { tableData.push( { label: item.label, data: facility[ item.name ] } ) }
   } );
 
-  let ADDR_1 = ( facility.ADDR_1 && facility.ADDR_2 )
-  ? `${ facility.ADDR_1 }
-${ facility.ADDR_2 }`
-  : facility.ADDR_1
-        ? facility.ADDR_1
-        : facility.ADDR_2
-          ? facility.ADDR_2
-          : "" ;
+  let ADDR_1 = [ facility.ADDR_1, facility.ADDR_2 ].filter( ( item ) => !!item ).join( "\n" );
 
   let ADDR_2 = "";
 
@@ -31,11 +24,8 @@ ${ facility.ADDR_2 }`
 
   if( facility.POSTAL_CODE ) { ADDR_2 += Postal_Code_6_to_7( facility.POSTAL_CODE ); };
 
-  let ADDR = !( ADDR_1 && ADDR_2 )
-             ? ( ADDR_1 || ADDR_2 )
-             : `${ ADDR_1 }
-${ ADDR_2 }`;
-  
+  let ADDR = [ ADDR_1, ADDR_2 ].filter( ( item ) => !!item ).join( "\n" );
+
   if( ADDR ) {
     tableData.push( { label: "Address", data: ADDR } )
   };

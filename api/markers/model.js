@@ -1,6 +1,6 @@
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-let locationSchema = new mongoose.Schema( {
+const locationSchema = new mongoose.Schema( {
   loc: {
     coordinates: [ Number ], 
     type: {

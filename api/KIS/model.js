@@ -1,9 +1,6 @@
-let mongoose = require('mongoose');
+const mongoose = require( 'mongoose' );
+const bilingualName = require( '../bilingualName/schema.js' );
 
-let KISSchema = new mongoose.Schema( {
-  ID: Number, 
-  NAME_EN: String, 
-  NAME_FR: String
-}, { collection: 'KIS' } );
+const KISSchema = new mongoose.Schema( bilingualName, { collection: 'KIS' } );
 
 module.exports = mongoose.model( 'KIS', KISSchema );

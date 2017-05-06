@@ -1,8 +1,6 @@
-let mongoose = require('mongoose');
+const mongoose = require( 'mongoose' );
+const unilingualName = require( '../unilingualName/schema.js' );
 
-let CMASchema = new mongoose.Schema( {
-  ID: Number, 
-  NAME: String
-}, { collection: 'CMA' } );
+const CMASchema = new mongoose.Schema( unilingualName, { collection: 'CMA' } );
 
 module.exports = mongoose.model( 'CMA', CMASchema );

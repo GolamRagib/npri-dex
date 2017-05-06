@@ -1,6 +1,6 @@
-let webpack = require( 'webpack' );
-let dotenv = require( 'dotenv-webpack' );
-let CompressionPlugin = require( 'compression-webpack-plugin' );
+const webpack = require( 'webpack' );
+const dotenv = require( 'dotenv-webpack' );
+const CompressionPlugin = require( 'compression-webpack-plugin' );
 
 module.exports =
 { devtool: 'cheap-module-source-map',

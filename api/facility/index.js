@@ -1,7 +1,7 @@
-let express = require('express');
-let router = new express.Router();
+const express = require('express');
+const router = new express.Router();
 
-let controller = require('./controller');
+const controller = require('./controller');
 
 router.get( '/', controller.index);
 router.get( '/:id', controller.facility);

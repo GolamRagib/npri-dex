@@ -1,9 +1,6 @@
-let mongoose = require('mongoose');
+const mongoose = require( 'mongoose' );
+const bilingualName = require( '../bilingualName/schema.js' );
 
-let MDASchema = new mongoose.Schema( {
-  ID: Number, 
-  NAME_EN: String,
-  NAME_FR: String
-}, { collection: 'MDA' } );
+const MDASchema = new mongoose.Schema( bilingualName, { collection: 'MDA' } );
 
 module.exports = mongoose.model( 'MDA', MDASchema );

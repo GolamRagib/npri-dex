@@ -32,7 +32,9 @@
     "google-maps": "^3.2.1",
     "jquery": "^3.1.1",
     "leaflet": "^1.0.3",
-    "lodash": "^4.17.4",
+    "lodash.clamp": "^4.0.3",
+    "lodash.debounce": "^4.0.8",
+    "lodash.inrange": "^3.3.6",
     "material-ui": "^0.17.1",
     "mongoose": "^4.6.8",
     "node-sass": "^4.5.2",
@@ -46,7 +48,6 @@
     "react-tap-event-plugin": "^2.0.1",
     "sass-loader": "^4.1.1",
     "style-loader": "^0.16.1",
-    "uniloc": "^0.3.0",
     "url-loader": "^0.5.8",
     "webpack": "^1.13.3",
     "webpack-dev-middleware": "^1.8.4"

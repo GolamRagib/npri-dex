@@ -1,10 +1,10 @@
-let Facility = require( './model' );
-let CMA = require( '../CMA/model' );
-let CSD = require( '../CSD/model' );
-let ECOZONE = require( '../ECOZONE/model' );
-let ER = require( '../ER/model' );
-let KIS = require( '../KIS/model' );
-let MDA = require( '../MDA/model' );
+const Facility = require( './model' );
+const CMA = require( '../CMA/model' );
+const CSD = require( '../CSD/model' );
+const ECOZONE = require( '../ECOZONE/model' );
+const ER = require( '../ER/model' );
+const KIS = require( '../KIS/model' );
+const MDA = require( '../MDA/model' );
 
 exports.index = function( req, res ) {
   res.status( 404 );
@@ -16,7 +16,7 @@ exports.facility = function( req, res ) {
   .findById( req.params.id )
   .populate( 'CMA CSD ECOZONE ER KIS MDA' )
   .lean( true )
-  .exec( ( err, facility ) => { err 
-                                ? ( res.status( 404 ), res.send( err ) ) 
+  .exec( ( err, facility ) => { err
+                                ? ( res.status( 404 ), res.send( err ) )
                                 : res.send( facility ) } )
 };

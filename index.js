@@ -1,10 +1,10 @@
-let dotenv = require( 'dotenv' );
-let express = require( 'express' );
-let webpack = require( 'webpack' );
-let mongoose = require( 'mongoose' );
-let bodyParser = require( 'body-parser' );
-let compression = require( 'compression' );
-let webpackMiddleware = require( 'webpack-dev-middleware' );
+const dotenv = require( 'dotenv' );
+const express = require( 'express' );
+const webpack = require( 'webpack' );
+const mongoose = require( 'mongoose' );
+const bodyParser = require( 'body-parser' );
+const compression = require( 'compression' );
+const webpackMiddleware = require( 'webpack-dev-middleware' );
 
 dotenv.config();
 

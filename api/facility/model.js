@@ -1,6 +1,6 @@
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-let facilitySchema = new mongoose.Schema( {
+const facilitySchema = new mongoose.Schema( {
   NPRI_ID: String, 
   COMP_NAME: String, 
   FACI_NAME: String, 

@@ -1,9 +1,6 @@
-let mongoose = require('mongoose');
+const mongoose = require( 'mongoose' );
+const bilingualName = require( '../bilingualName/schema.js' );
 
-let ECOZONESchema = new mongoose.Schema( {
-  ID: Number, 
-  NAME_EN: String, 
-  NAME_FR: String
-}, { collection: 'ECOZONE' } );
+const ECOZONESchema = new mongoose.Schema( bilingualName, { collection: 'ECOZONE' } );
 
 module.exports = mongoose.model( 'ECOZONE', ECOZONESchema );
