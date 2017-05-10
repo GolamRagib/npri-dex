@@ -50,7 +50,7 @@ export default class MapComponent extends React.Component {
       mapCentre: { lat: 43.648264, lng: -79.397858 },
       geoLocation: { lat: "", lng: "", accuracy: "" },
       bounds: { latN: "", latS: "", lngE: "", lngW: "" }
-    };
+    }
   }
 
   componentDidMount() {
@@ -108,7 +108,7 @@ export default class MapComponent extends React.Component {
     // replace this with something better
          if( error.code === 1 ) { window.alert( "Please enable location services to use this feature." ) }
     else if( error.code === 2 ) { window.alert( "Geolocation is not supported for this Browser/OS.") }
-    else if( error.code === 3 ) { window.alert( "Unable to get your location.") };
+    else if( error.code === 3 ) { window.alert( "Unable to get your location.") }
   }
 
   geolocationFailureOnLoad = () => this.setDefaultLocation();
@@ -194,7 +194,7 @@ export default class MapComponent extends React.Component {
     let bounds = { latN: latNE + latDelta,
                    latS: latSW - latDelta,
                    lngE: lngNE + lngDelta,
-                   lngW: lngSW - lngDelta };
+                   lngW: lngSW - lngDelta }
 
     if ( JSON.stringify( bounds ) !== JSON.stringify( this.state.bounds ) ) {
       this.setState( { bounds: bounds,
@@ -210,7 +210,7 @@ export default class MapComponent extends React.Component {
     } else {
       window.location.replace( `${ window.location.pathname }#` );
       window.history.pushState( {} , "",                    `#` );
-    };
+    }
   }
 
   render() {
@@ -238,12 +238,10 @@ export default class MapComponent extends React.Component {
         <LayersControl position="bottomright" >
           <BaseLayer name="CartoDB.Positron" checked >
             <TileLayer url={ `https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}${ L.Browser.retina ? `@2x` : `` }.png` }
-                       detectRetina={ true }
                        attribution={ "&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> &copy; <a href=\"http://cartodb.com/attributions\" >CartoDB</a>" } />
           </BaseLayer>
           <BaseLayer name="Stamen.Terrain" >
             <TileLayer url={ `https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}${ L.Browser.retina ? `@2x` : `` }.png` }
-                       detectRetina={ true }
                        attribution={ "Map tiles by <a href=\"http://stamen.com\" >Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\" >CC BY 3.0</a> &mdash; Map data &copy; <a href=\"http://www.openstreetmap.org/copyright\" >OpenStreetMap</a>" } />
           </BaseLayer>
           { ( this.state.locationPermission )
@@ -308,6 +306,6 @@ export default class MapComponent extends React.Component {
 
       </Map>
     )
-  };
+  }
 
-};
+}
