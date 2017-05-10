@@ -1,24 +1,22 @@
 import React from 'react';
-import { Table,
-         TableRow,
-         TableBody,
-         TableRowColumn } from 'material-ui/Table';
+
+import Divider from 'material-ui/Divider';
+import { List,
+         ListItem } from 'material-ui/List';
+import { darkBlack,
+         lightBlack } from 'material-ui/styles/colors';
 
 const FacilityData = ( { facility } ) => {
-  return (
-    <Table selectable={ false } >
-      <TableBody displayRowCheckbox={ false }
-                  showRowHover={ true }
-                  stripedRows={ false } >
-        { facility.map( ( row, index ) => (
-          <TableRow key={ index } >
-            <TableRowColumn style={ { whiteSpace: 'pre-line', wordWrap: 'break-word' } } >{ row.label }</TableRowColumn>
-            <TableRowColumn style={ { whiteSpace: 'pre-line', wordWrap: 'break-word' } } >{ row.data }</TableRowColumn>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
+  return <List style={ { padding: 0 } } >
+    { facility.map( ( row, index ) => (
+      <div key={ index } >
+        <ListItem innerDivStyle={ { padding: 16 } }
+                  primaryText={ <p style={ { color: lightBlack, fontSize: 14, margin: 0 } } >{ row.label }</p> }
+                  secondaryText={ <p style={ { color: darkBlack, margin: 0 } } >{ row.data }</p> } />
+        { ( index !== ( facility.length - 1 ) ) ? <Divider /> : "" }
+      </div>
+    ) ) }
+  </List>
 };
 
 export default FacilityData;
