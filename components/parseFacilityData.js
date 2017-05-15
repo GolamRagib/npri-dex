@@ -1,4 +1,4 @@
-import Postal_Code_6_to_7 from './Postal_Code_6_to_7';
+import FormatPostalCode from './FormatPostalCode';
 
 export default function ParseFacilityData( facility ) {
   let tableData = [];
@@ -22,9 +22,9 @@ export default function ParseFacilityData( facility ) {
 
   if( facility.POSTAL_CODE && ( facility.CITY || facility.PROVINCE ) ) { ADDR_2 += " "; };
 
-  if( facility.POSTAL_CODE ) { ADDR_2 += Postal_Code_6_to_7( facility.POSTAL_CODE ); };
+  if( facility.POSTAL_CODE ) { ADDR_2 += FormatPostalCode( facility.POSTAL_CODE ); };
 
-  let ADDR = [ ADDR_1, ADDR_2 ].filter( ( item ) => !!item ).join( ", " );
+  let ADDR = [ ADDR_1, ADDR_2 ].filter( ( item ) => !!item ).join( "\n" );
 
   if( ADDR ) {
     tableData.push( { label: "Address", data: ADDR } )
