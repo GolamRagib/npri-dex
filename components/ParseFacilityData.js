@@ -10,7 +10,7 @@ export default function ParseFacilityData( facility ) {
     if( facility[ item.name ] ) { tableData.push( { label: item.label, data: facility[ item.name ] } ) }
   } );
 
-  let ADDR_1 = [ facility.ADDR_1, facility.ADDR_2 ].filter( ( item ) => !!item ).join( ", " );
+  let ADDR_1 = [ facility.ADDR_1, facility.ADDR_2 ].filter( ( item ) => !!item ).join( "\n" );
 
   let ADDR_2 = "";
 
