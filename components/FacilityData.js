@@ -16,6 +16,7 @@ const FacilityData = ( { facility } ) => {
             <h4 style={ {
               color: lightBlack,
               fontSize: 14,
+              fontWeight: 'normal',
               margin: '16px 16px 0px 16px',
             } } >
               { row.label }
